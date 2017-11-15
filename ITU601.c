@@ -12,7 +12,7 @@
 void Quantificar(int R,int G,int B,int *info);
 
 int main(){
-
+/*
   int data[3];
   int r,g,b;
   while(1){
@@ -20,9 +20,9 @@ int main(){
     scanf("%d",&g);
     scanf("%d",&b);
     Quantificar(r,g,b,data);
-    printf("Y = %f\nCr = %f\nCb = %f\n",data[0],data[1],data[2]);
+    printf("Cb = %d\nYq = %d\nCr = %d\n",data[0],data[1],data[2]);
   }
-  /*
+  */
   FILE * pFitxerSortida;                      // Punter al fitxer de sortida
   unsigned char ucBufferlinia[BYTES_1LINIA];  // Buffer de linia
   int nIndex, nLinia, nColumna;
@@ -62,7 +62,7 @@ int main(){
     {
       printf("\nError. No es pot crear el fitxer %s\n",FITXER_SORTIDA);
     }
-    */
+
   return 0;
 }
 
@@ -81,12 +81,23 @@ void Quantificar(int R,int G,int B,int *info){
 
   double Yq, Y, Cr, Cb;
 
-  Y  = R * 0.3 + G * 0.59 + B * 0.11;
+  if(R != 1 && G != 1 && B != 1){
+    // Hauriem d'afegir el 75% de les barres?
+    // S'ha de ponderar a 0.7v ?
+
+    Y  = R * 0.3 + G * 0.59 + B * 0.11;
+  }else{
+    //En el cas de ser el blanc, no afegim
+
+    Y  = R * 0.3 + G * 0.59 + B * 0.11;
+  }
+
+
   Yq = round(219 * Y + 16);
   Cb = round(224 * 0.564 * (B - Y) + 128);
   Cr = round(224 * 0.713 * (R - Y) + 128);
 
-  info[0] = Yq;
-  info[1] = Cr;
-  info[2] = Cb;
+  info[0] = Cb;
+  info[1] = Yq;
+  info[2] = Cr;
 }
