@@ -8,39 +8,42 @@
 #define TOTAL_LINIES 576
 #define BYTES_1LINIA 1440
 
-int main()
-{
+
+void Quantificar(int R,int G,int B,int *a);
+/*
+int main(){
+
   FILE * pFitxerSortida;                      // Punter al fitxer de sortida
-  unsigned char ucBufferlinia[BYTES_1LINIA];  // Buffer de línia
+  unsigned char ucBufferlinia[BYTES_1LINIA];  // Buffer de lï¿½nia
   int nIndex, nLinia, nColumna;
   int nYo1, nYo2, nUo1,nVo2;
 
   // Obrim el fitxer de sortida test.uyvy
   if ( (pFitxerSortida = fopen(FITXER_SORTIDA,"wb")) != NULL )
-    {		
-      // Bucle del total de línies de la imatge
+    {
+      // Bucle del total de lï¿½nies de la imatge
       for ( nLinia = 0; nLinia < TOTAL_LINIES; nLinia++ )
 	{
-	  // Bucle que recorre les mostres d'una linia 
-	  for ( nColumna = 0; nColumna < BYTES_1LINIA; nColumna = nColumna+4) 	
+	  // Bucle que recorre les mostres d'una linia
+	  for ( nColumna = 0; nColumna < BYTES_1LINIA; nColumna = nColumna+4)
 	    {
 	      // exemple: blanc
-	      nYo1=235;  // mostra de Y			
+	      nYo1=235;  // mostra de Y
 	      nUo1=128;  // mostra de U
 	      nYo2=235;  // mostra de Y
 	      nVo2=128;  // mostra de V
 
-	      ucBufferlinia[nColumna]     = nUo1;  // Modificarem el valor 
-	      ucBufferlinia[nColumna + 1] = nYo1;  // dels dos píxels de la 
+	      ucBufferlinia[nColumna]     = nUo1;  // Modificarem el valor
+	      ucBufferlinia[nColumna + 1] = nYo1;  // dels dos pï¿½xels de la
 	      ucBufferlinia[nColumna + 2] = nVo2;  // matriu amb els valors
 	      ucBufferlinia[nColumna + 3] = nYo2;  // de sortida
 	    }
 
 	  // Copiem les mostres d'una linia al fitxer de sortida
 	  fwrite( ucBufferlinia, BYTES_1LINIA , 1, pFitxerSortida);
-	}			
+	}
       printf("\nFitxer test.uyvy generat!\n");
-		
+
       fclose(pFitxerSortida);		// Tanquem el fitxer de sortida
     }
   else
@@ -48,4 +51,29 @@ int main()
       printf("\nError. No es pot crear el fitxer test.uyvy\n");
     }
   return 0;
+}
+*/
+
+/*
+  @Params:
+    R: Component R de la mostra
+    G: Component G de la mostra
+    B: Component B de la mostra
+    info: guarda la informacio obtinguda de quantificar.
+      info[0] guarda la Yq
+      info[1] guarda la Cr
+      info[2] guarda la Cb
+*/
+void Quantificar(int R,int G,int B,int *info){
+
+  int Yq,Y,Cr,Cb;
+
+  Y = R * 0.3 + G * 0.59 + B * 0.11;
+  Yq = round(219 * Y + 16);
+  Cb = round(224 * 0.564 * (B - Y) + 128);
+  Cr = round(224 * 0.713 * (R - Y) + 128);
+
+  info[0] = Yq;
+  info[1] = Cr;
+  info[2] = Cb;
 }
