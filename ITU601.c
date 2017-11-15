@@ -14,14 +14,14 @@ void Quantificar(int R,int G,int B,int *info);
 int main(){
 
   FILE * pFitxerSortida;                      // Punter al fitxer de sortida
-  unsigned char ucBufferlinia[BYTES_1LINIA];  // Buffer de l�nia
+  unsigned char ucBufferlinia[BYTES_1LINIA];  // Buffer de linia
   int nIndex, nLinia, nColumna;
   int nYo1, nYo2, nUo1,nVo2;
 
   // Obrim el fitxer de sortida test.uyvy
   if ( (pFitxerSortida = fopen(FITXER_SORTIDA,"wb")) != NULL )
     {
-      // Bucle del total de l�nies de la imatge
+      // Bucle del total de linies de la imatge
       for ( nLinia = 0; nLinia < TOTAL_LINIES; nLinia++ )
 	{
 	  // Bucle que recorre les mostres d'una linia
@@ -34,7 +34,7 @@ int main(){
 	      nVo2=128;  // mostra de V
 
 	      ucBufferlinia[nColumna]     = nUo1;  // Modificarem el valor
-	      ucBufferlinia[nColumna + 1] = nYo1;  // dels dos p�xels de la
+	      ucBufferlinia[nColumna + 1] = nYo1;  // dels dos pixels de la
 	      ucBufferlinia[nColumna + 2] = nVo2;  // matriu amb els valors
 	      ucBufferlinia[nColumna + 3] = nYo2;  // de sortida
 	    }
