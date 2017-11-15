@@ -9,8 +9,8 @@
 #define BYTES_1LINIA 1440
 
 
-void Quantificar(int R,int G,int B,int *a);
-/*
+void Quantificar(int R,int G,int B,int *info);
+
 int main(){
 
   FILE * pFitxerSortida;                      // Punter al fitxer de sortida
@@ -52,7 +52,7 @@ int main(){
     }
   return 0;
 }
-*/
+
 
 /*
   @Params:
