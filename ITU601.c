@@ -13,10 +13,22 @@ void Quantificar(int R,int G,int B,int *info);
 
 int main(){
 
+  int data[3];
+  int r,g,b;
+  while(1){
+    scanf("%d",&r);
+    scanf("%d",&g);
+    scanf("%d",&b);
+    Quantificar(r,g,b,data);
+    printf("Y = %f\nCr = %f\nCb = %f\n",data[0],data[1],data[2]);
+  }
+  /*
   FILE * pFitxerSortida;                      // Punter al fitxer de sortida
   unsigned char ucBufferlinia[BYTES_1LINIA];  // Buffer de linia
   int nIndex, nLinia, nColumna;
   int nYo1, nYo2, nUo1,nVo2;
+
+
 
   // Obrim el fitxer de sortida test.uyvy
   if ( (pFitxerSortida = fopen(FITXER_SORTIDA,"wb")) != NULL )
@@ -42,14 +54,15 @@ int main(){
 	  // Copiem les mostres d'una linia al fitxer de sortida
 	  fwrite( ucBufferlinia, BYTES_1LINIA , 1, pFitxerSortida);
 	}
-      printf("\nFitxer test.uyvy generat!\n");
+      printf("\nFitxer %s generat!\n",FITXER_SORTIDA);
 
       fclose(pFitxerSortida);		// Tanquem el fitxer de sortida
     }
   else
     {
-      printf("\nError. No es pot crear el fitxer test.uyvy\n");
+      printf("\nError. No es pot crear el fitxer %s\n",FITXER_SORTIDA);
     }
+    */
   return 0;
 }
 
@@ -66,9 +79,9 @@ int main(){
 */
 void Quantificar(int R,int G,int B,int *info){
 
-  int Yq,Y,Cr,Cb;
+  double Yq, Y, Cr, Cb;
 
-  Y = R * 0.3 + G * 0.59 + B * 0.11;
+  Y  = R * 0.3 + G * 0.59 + B * 0.11;
   Yq = round(219 * Y + 16);
   Cb = round(224 * 0.564 * (B - Y) + 128);
   Cr = round(224 * 0.713 * (R - Y) + 128);
