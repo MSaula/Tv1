@@ -8,47 +8,34 @@
 #define TOTAL_LINIES 576
 #define BYTES_1LINIA 1440
 
-
+void SenyalTipus5(unsigned char * buffer,int pos,int OnlyY);
 void Quantificar(int R,int G,int B,int *info);
+void grabarYUV(unsigned char * buffer,int pos,int Y,int U,int V,int OnlyY);
 
 int main(){
-/*
-  int data[3];
-  int r,g,b;
-  while(1){
-    scanf("%d",&r);
-    scanf("%d",&g);
-    scanf("%d",&b);
-    Quantificar(r,g,b,data);
-    printf("Cb = %d\nYq = %d\nCr = %d\n",data[0],data[1],data[2]);
-  }
-  */
+
   FILE * pFitxerSortida;                      // Punter al fitxer de sortida
   unsigned char ucBufferlinia[BYTES_1LINIA];  // Buffer de linia
   int nIndex, nLinia, nColumna;
-  int nYo1, nYo2, nUo1,nVo2;
-
-
+  int aux[4];
 
   // Obrim el fitxer de sortida test.uyvy
   if ( (pFitxerSortida = fopen(FITXER_SORTIDA,"wb")) != NULL )
     {
       // Bucle del total de linies de la imatge
-      for ( nLinia = 0; nLinia < TOTAL_LINIES; nLinia++ )
+      for ( nLinia = 0; nLinia < TOTAL_LINIES; nLinia++)
 	{
 	  // Bucle que recorre les mostres d'una linia
 	  for ( nColumna = 0; nColumna < BYTES_1LINIA; nColumna = nColumna+4)
 	    {
-	      // exemple: blanc
-	      nYo1=235;  // mostra de Y
-	      nUo1=128;  // mostra de U
-	      nYo2=235;  // mostra de Y
-	      nVo2=128;  // mostra de V
-
-	      ucBufferlinia[nColumna]     = nUo1;  // Modificarem el valor
-	      ucBufferlinia[nColumna + 1] = nYo1;  // dels dos pixels de la
-	      ucBufferlinia[nColumna + 2] = nVo2;  // matriu amb els valors
-	      ucBufferlinia[nColumna + 3] = nYo2;  // de sortida
+        if(nLinia < TOTAL_LINIES / 2){
+          //Senyal 5/
+          SenyalTipus5(ucBufferlinia,nColumna);
+        }else{
+          //Senyal 4
+          Quantificar(1,1,1,aux);
+          grabarYUV(ucBufferlinia,nColumna,aux[],aux[],aux[],aux[]);
+        }
 	    }
 
 	  // Copiem les mostres d'una linia al fitxer de sortida
@@ -74,30 +61,58 @@ int main(){
     B: Component B de la mostra
     info: guarda la informacio obtinguda de quantificar.
       info[0] guarda la Yq
-      info[1] guarda la Cr
-      info[2] guarda la Cb
+      info[1] guarda la Cb
+      info[2] guarda la Cr
 */
 void Quantificar(int R,int G,int B,int *info){
 
   double Yq, Y, Cr, Cb;
 
-  if(R != 1 && G != 1 && B != 1){
-    // Hauriem d'afegir el 75% de les barres?
-    // S'ha de ponderar a 0.7v ?
-
-    Y  = R * 0.3 + G * 0.59 + B * 0.11;
-  }else{
-    //En el cas de ser el blanc, no afegim
-
-    Y  = R * 0.3 + G * 0.59 + B * 0.11;
-  }
-
-
-  Yq = round(219 * Y + 16);
+  Y  = R * 0.3 + G * 0.59 + B * 0.11;
+  Yq = round(219 * Y + 16); // * 0.7 * 0.75??
   Cb = round(224 * 0.564 * (B - Y) + 128);
   Cr = round(224 * 0.713 * (R - Y) + 128);
 
   info[0] = Cb;
   info[1] = Yq;
   info[2] = Cr;
+  info[3] = Yq2;
+}
+
+void SenyalTipus5(unsigned char *buffer,int pos,int OnlyY){
+  //Senyal controlada unicament per Y
+  int Y = 0;
+  int Yq = 0;
+  double m = 0;
+
+  //El pic esta a la pos 13us
+  //Definim la funcio del triangle.
+  if(6.5 < pos % 13){
+    //Priera meitat del triangle
+    m = 0.7/13;
+  }else{
+    //Segona meitat del triangle
+    m = -0.7/13;
+  }
+
+  Y = m * pos;
+  Yq = round(219 * Y + 16);
+  Yq *= 0.7; //ponderem el senyal?
+
+
+
+
+  buffer[pos]     = 0;  // No existeix Cb
+  buffer[pos + 1] = Yq;
+  buffer[pos + 2] = 0;  // No existeix Cb
+  buffer[pos + 4] = Yq2;
+
+}
+
+void grabarYUV (unsigned char *buffer,int pos,int Y,int U,int V,int OnlyY){
+  //Al ser 4:2:2 la Yf es diferent a Y perque es la lluminancia del segon px.
+  buffer[pos]     = U;
+  buffer[pos + 1] = Y;
+  buffer[pos + 2] = V;
+  buffer[pos + 3] = Yf;
 }
