@@ -8,16 +8,16 @@
 #define TOTAL_LINIES 576
 #define BYTES_1LINIA 1440
 
-void SenyalTipus5(unsigned char * buffer,int pos,int OnlyY);
+void SenyalTipus5(unsigned char * buffer,int pos);
+void SenyalTipus4(unsigned char * buffer,int pos);
 void Quantificar(int R,int G,int B,int *info);
-void grabarYUV(unsigned char * buffer,int pos,int Y,int U,int V,int OnlyY);
 
 int main(){
 
   FILE * pFitxerSortida;                      // Punter al fitxer de sortida
   unsigned char ucBufferlinia[BYTES_1LINIA];  // Buffer de linia
-  int nIndex, nLinia, nColumna;
-  int aux[4];
+  int nLinia, nColumna;
+
 
   // Obrim el fitxer de sortida test.uyvy
   if ( (pFitxerSortida = fopen(FITXER_SORTIDA,"wb")) != NULL )
@@ -29,12 +29,11 @@ int main(){
 	  for ( nColumna = 0; nColumna < BYTES_1LINIA; nColumna = nColumna+4)
 	    {
         if(nLinia < TOTAL_LINIES / 2){
-          //Senyal 5/
+          //Senyal 5
           SenyalTipus5(ucBufferlinia,nColumna);
         }else{
           //Senyal 4
-          Quantificar(1,1,1,aux);
-          grabarYUV(ucBufferlinia,nColumna,aux[],aux[],aux[],aux[]);
+          SenyalTipus4(ucBufferlinia,nColumna);
         }
 	    }
 
@@ -79,7 +78,24 @@ void Quantificar(int R,int G,int B,int *info){
   info[3] = Yq2;
 }
 
-void SenyalTipus5(unsigned char *buffer,int pos,int OnlyY){
+void SenyalTipus4(unsigned char *buffer,int pos){
+  int aux[4];
+
+  Quantificar(1,1,1,aux);
+
+  int U  = aux[0];
+  int Y  = aux[1];
+  int V  = aux[2];
+  int Yf = aux[3];
+
+  //Al ser 4:2:2 la Yf es diferent a Y perque es la lluminancia del segon px.
+  buffer[pos]     = U;
+  buffer[pos + 1] = Y;
+  buffer[pos + 2] = V;
+  buffer[pos + 3] = Yf;
+}
+
+void SenyalTipus5(unsigned char *buffer,int pos){
   //Senyal controlada unicament per Y
   int Y = 0;
   int Yq = 0;
@@ -97,22 +113,11 @@ void SenyalTipus5(unsigned char *buffer,int pos,int OnlyY){
 
   Y = m * pos;
   Yq = round(219 * Y + 16);
-  Yq *= 0.7; //ponderem el senyal?
-
-
-
+  //Yq *= 0.7; //ponderem el senyal?
 
   buffer[pos]     = 0;  // No existeix Cb
   buffer[pos + 1] = Yq;
   buffer[pos + 2] = 0;  // No existeix Cb
   buffer[pos + 4] = Yq2;
 
-}
-
-void grabarYUV (unsigned char *buffer,int pos,int Y,int U,int V,int OnlyY){
-  //Al ser 4:2:2 la Yf es diferent a Y perque es la lluminancia del segon px.
-  buffer[pos]     = U;
-  buffer[pos + 1] = Y;
-  buffer[pos + 2] = V;
-  buffer[pos + 3] = Yf;
 }
