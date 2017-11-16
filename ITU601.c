@@ -10,7 +10,7 @@
 
 void SenyalTipus5(unsigned char * buffer,int pos);
 void SenyalTipus4(unsigned char * buffer,int pos);
-void Quantificar(int R,int G,int B,int *info);
+void Quantificar(int R,int G,int B,int R2,int G2,int B2,int *info);
 
 int main(){
 
@@ -63,12 +63,14 @@ int main(){
       info[1] guarda la Cb
       info[2] guarda la Cr
 */
-void Quantificar(int R,int G,int B,int *info){
+void Quantificar(int R,int G,int B,int R2,int G2,int B2,int *info){
 
-  double Yq, Y, Cr, Cb;
+  double Yq, Y,Y2, Cr, Cb,Yq2;
 
   Y  = R * 0.3 + G * 0.59 + B * 0.11;
+  Y2 = R2 * 0.3 + G2 * 0.59 + B2 * 0.11;
   Yq = round(219 * Y + 16); // * 0.7 * 0.75??
+  Yq2 = round(219 * Y2 + 16);
   Cb = round(224 * 0.564 * (B - Y) + 128);
   Cr = round(224 * 0.713 * (R - Y) + 128);
 
@@ -79,20 +81,35 @@ void Quantificar(int R,int G,int B,int *info){
 }
 
 void SenyalTipus4(unsigned char *buffer,int pos){
-  int aux[4];
+  int aux[4],U,V,Y,Y2;
 
-  Quantificar(1,1,1,aux);
+  if(pos % (BYTES_1LINIA / 8) ){
+    Quantificar(1,1,1,0,0,0,aux);
+  }
 
-  int U  = aux[0];
-  int Y  = aux[1];
-  int V  = aux[2];
-  int Yf = aux[3];
+  if(pos < BYTES_1LINIA/2){
+    //BW
+
+    U  = 0;
+    Y  = round(219 * Y + 16);
+    V  = 0;
+    Y2 = round(219 * Y + 16);
+
+  }else{
+    //Color
+
+    U  = aux[0];
+    Y  = aux[1];
+    V  = aux[2];
+    Y2 = aux[3];
+  }
 
   //Al ser 4:2:2 la Yf es diferent a Y perque es la lluminancia del segon px.
   buffer[pos]     = U;
   buffer[pos + 1] = Y;
   buffer[pos + 2] = V;
-  buffer[pos + 3] = Yf;
+  buffer[pos + 3] = Y2;
+
 }
 
 void SenyalTipus5(unsigned char *buffer,int pos){
